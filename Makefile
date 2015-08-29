@@ -8,7 +8,7 @@ clean:
 	rm -rf build
 	rm -rf dist
 
-build/hamconntri: hamconntri.c
+build/hamconntri: hamconntri.c lw_plane_graph.c
 	mkdir -p build
 	cc -o $@ -O4 -Wall $^
 

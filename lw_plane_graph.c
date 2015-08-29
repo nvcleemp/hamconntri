@@ -39,6 +39,12 @@ void decodePlanarCode(unsigned short* code, GRAPH graph, ADJACENCY adj, bitset* 
 
         codePosition++; /* read the closing 0 */
     }
+    
+    if(edgeCounter != 6*code[0] - 12){
+        //verify that the graph is a triangulation
+        fprintf(stderr, "Not a triangulation -- exiting!\n");
+        exit(EXIT_FAILURE);
+    }
 }
 
 /**

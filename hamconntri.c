@@ -17,8 +17,132 @@ typedef int boolean;
 #define FALSE 0
 #define TRUE 1
 
-boolean isHamiltonianConnected(GRAPH graph, ADJACENCY adj, bitset* neighbours){
+
+bitset currentPath;
+int pathSequence[MAXN];
+int pathLength;
+bitset connected[MAXN+1];
+
+void foundPath(GRAPH graph, ADJACENCY adj, bitset *neighbours){
+    int i;
+    int start = pathSequence[0];
+    int end = pathSequence[pathLength-1];
+    
+    //start and end are connected by a hamiltonian path
+    ADD(connected[start], end);
+    ADD(connected[end], start);
+    
+    if(CONTAINS(neighbours[start], end)){
+        //we found a hamiltonian cycle
+        //all adjacent vertices on the cycle are hamiltonian-connected
+        for(i = 1; i < pathLength; i++){
+            int v1 = pathSequence[i-1];
+            int v2 = pathSequence[i];
+            ADD(connected[v1], v2);
+            ADD(connected[v2], v1);
+        }
+    }
+}
+
+/**
+  * 
+  */
+boolean continuePath(GRAPH graph, ADJACENCY adj, bitset *neighbours, int last, int targetVertex, int remaining, int unvisitedNeighboursOfTarget) {
+    int i;
+    
+    if(remaining==1){
+        if(CONTAINS(neighbours[targetVertex], last)){
+            pathSequence[pathLength] = targetVertex;
+            pathLength++;
+            foundPath(graph, adj, neighbours);
+            return TRUE;
+        } else {
+            return FALSE;
+        }
+    }
+    
+    if(!unvisitedNeighboursOfTarget){
+        //the target vertex is no longer reachable
+        return FALSE;
+    }
+    
+    for(i = 0; i < adj[last]; i++){
+        if(graph[last][i] != targetVertex && !CONTAINS(currentPath, graph[last][i])){
+            ADD(currentPath, graph[last][i]);
+            pathSequence[pathLength] = graph[last][i];
+            pathLength++;
+            if(continuePath(graph, adj, neighbours, graph[last][i],
+                    targetVertex, remaining - 1,
+                    (CONTAINS(neighbours[targetVertex], graph[last][i]) ?
+                        unvisitedNeighboursOfTarget - 1 :
+                        unvisitedNeighboursOfTarget))){
+                return TRUE;
+            }
+            pathLength--;
+            REMOVE(currentPath, graph[last][i]);
+        }
+    }
+    
     return FALSE;
+}
+
+boolean startPath(GRAPH graph, ADJACENCY adj, bitset *neighbours, int startVertex, int targetVertex, int order){
+    int i;
+    
+    int unvisitedNeighboursOfTarget = adj[targetVertex];
+    if(CONTAINS(neighbours[targetVertex], startVertex)){
+        unvisitedNeighboursOfTarget--;
+    }
+    
+    ADD(currentPath, startVertex);
+    pathSequence[0] = startVertex;
+    for(i = 0; i < adj[startVertex]; i++){
+        if(graph[startVertex][i] != targetVertex){
+            ADD(currentPath, graph[startVertex][i]);
+            pathSequence[1] = graph[startVertex][i];
+            pathLength = 2;
+            
+            //search for path containing the edge (v, graph[v][i])
+            if(continuePath(graph, adj, neighbours, graph[startVertex][i],
+                    targetVertex, order - 2,
+                    (CONTAINS(neighbours[targetVertex], graph[startVertex][i]) ?
+                        unvisitedNeighboursOfTarget - 1 :
+                        unvisitedNeighboursOfTarget))){
+                return TRUE;
+            }
+            
+            REMOVE(currentPath, graph[startVertex][i]);
+        }
+    }
+    
+    return FALSE;
+}
+
+boolean isHamiltonianConnected(GRAPH graph, ADJACENCY adj, bitset* neighbours){
+    int i, j;
+    
+    //first we clear the information about which vertices are connected by a
+    //hamiltonian path
+    for(i = 1; i<=MAXN; i++){
+        connected[i] = EMPTY_SET;
+    }
+    
+    int order = graph[0][0];
+    
+    for(i=1; i<= order-1; i++){
+        for(j=i+1; j<= order; j++){
+            if(!CONTAINS(connected[i], j)){
+                //clear old path
+                currentPath = EMPTY_SET;
+                
+                if(!startPath(graph, adj, neighbours, i, j, order)){
+                    return FALSE;
+                }
+            }
+        }
+    }
+    
+    return TRUE;
 }
 
  //====================== USAGE =======================

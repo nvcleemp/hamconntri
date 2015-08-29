@@ -13,7 +13,7 @@
  //====================== USAGE =======================
 
 void help(char *name) {
-    fprintf(stderr, "The program %s checks whether a plane triangulation is hamiltonian-connected.\n\n", name);
+    fprintf(stderr, "The program %s checks whether a plane triangulation is hamiltonian-\nconnected.\n\n", name);
     fprintf(stderr, "Usage\n=====\n");
     fprintf(stderr, " %s [options]\n\n", name);
     fprintf(stderr, "Valid options\n=============\n");

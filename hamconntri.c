@@ -6,9 +6,20 @@
  */
 
 
- #include <stdlib.h>
- #include <stdio.h>
- #include <getopt.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <getopt.h>
+#include "bitset.h"
+#include "lw_plane_graph.h"
+
+typedef int boolean;
+
+#define FALSE 0
+#define TRUE 1
+
+boolean isHamiltonianConnected(GRAPH graph, ADJACENCY adj, bitset* neighbours){
+    return FALSE;
+}
 
  //====================== USAGE =======================
 

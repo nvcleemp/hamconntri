@@ -18,6 +18,8 @@
 
 // -1 because we start labeling vertices from 1
 #define MAXN (SET_CAPACITY - 1)
+#define MAXE (6*MAXN-12)    /* the maximum number of oriented edges */
+#define MAXCODELENGTH (MAXN+MAXE+3)
 
 typedef int boolean;
 

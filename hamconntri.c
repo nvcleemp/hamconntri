@@ -62,6 +62,38 @@ int main(int argc, char *argv[]) {
                 return EXIT_FAILURE;
         }
     }
+    
+    /*=========== process graphs ===========*/
+    GRAPH graph;
+    ADJACENCY adj;
+    bitset *neighbours = (bitset *)malloc(sizeof(bitset)*MAXN);
+    unsigned long long numberOfGraphs = 0ULL;
+    unsigned long long numberOfHamiltonianConnected = 0ULL;
+    unsigned long long numberOfNotHamiltonianConnected = 0ULL;
+    unsigned short code[MAXCODELENGTH];
+    int length;
+    while (readPlanarCode(code, &length, stdin)) {
+        decodePlanarCode(code, graph, adj, neighbours);
+        if(isHamiltonianConnected(graph, adj, neighbours)){
+            numberOfHamiltonianConnected++;
+        } else {
+            numberOfNotHamiltonianConnected++;
+        }
+        numberOfGraphs++;
+    }
+    
+    fprintf(stderr, "Read %llu graph%s.\n", numberOfGraphs, 
+                numberOfGraphs==1 ? "" : "s");
+    
+    fprintf(stderr, "   %llu graph%s %s hamiltonian-connected.\n",
+                numberOfHamiltonianConnected, 
+                numberOfHamiltonianConnected==1 ? "" : "s", 
+                numberOfHamiltonianConnected==1 ? "was" : "were");
+    fprintf(stderr, "   %llu graph%s %s not hamiltonian-connected.\n",
+                numberOfNotHamiltonianConnected, 
+                numberOfNotHamiltonianConnected==1 ? "" : "s", 
+                numberOfNotHamiltonianConnected==1 ? "was" : "were");
+    
 
     return EXIT_SUCCESS;
 }

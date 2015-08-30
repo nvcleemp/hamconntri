@@ -170,3 +170,13 @@ int readPlanarCode(unsigned short code[], int *length, FILE *file) {
 
 }
 
+void writePlanarCodeHeader(FILE *f){
+    fprintf(f, ">>planar_code<<");
+}
+
+void writeCode(FILE *f, unsigned short code[], int length){
+    int i;
+    for(i = 0; i < length; i++){
+        putc(code[i], f);
+    }
+}

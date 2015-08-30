@@ -33,6 +33,9 @@ void decodePlanarCode(unsigned short* code, GRAPH graph, ADJACENCY adj, bitset* 
 
 int readPlanarCode(unsigned short code[], int *length, FILE *file);
 
+void writePlanarCodeHeader(FILE *f);
+
+void writeCode(FILE *f, unsigned short code[], int length);
 
 #endif	/* LW_PLANE_GRAPH_H */
 

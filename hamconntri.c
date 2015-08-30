@@ -152,6 +152,10 @@ void help(char *name) {
     fprintf(stderr, "Usage\n=====\n");
     fprintf(stderr, " %s [options]\n\n", name);
     fprintf(stderr, "Valid options\n=============\n");
+    fprintf(stderr, "    -f, --filter\n");
+    fprintf(stderr, "       Filter graphs that are hamiltonian-connected.\n");
+    fprintf(stderr, "    -i, --invert\n");
+    fprintf(stderr, "       Invert the filter.\n");
     fprintf(stderr, "    -h, --help\n");
     fprintf(stderr, "       Print this help and return.\n");
 }
@@ -164,16 +168,25 @@ void usage(char *name) {
 int main(int argc, char *argv[]) {
 
     /*=========== commandline parsing ===========*/
-
+    boolean invert = FALSE;
+    boolean filter = FALSE;
     int c;
     char *name = argv[0];
     static struct option long_options[] = {
-         {"help", no_argument, NULL, 'h'}
+        {"invert", no_argument, NULL, 'i'},
+        {"filter", no_argument, NULL, 'f'},
+        {"help", no_argument, NULL, 'h'}
     };
     int option_index = 0;
 
-    while ((c = getopt_long(argc, argv, "h", long_options, &option_index)) != -1) {
+    while ((c = getopt_long(argc, argv, "hif", long_options, &option_index)) != -1) {
         switch (c) {
+            case 'i':
+                invert = TRUE;
+                break;
+            case 'f':
+                filter = TRUE;
+                break;
             case 'h':
                 help(name);
                 return EXIT_SUCCESS;
@@ -196,12 +209,21 @@ int main(int argc, char *argv[]) {
     unsigned long long numberOfNotHamiltonianConnected = 0ULL;
     unsigned short code[MAXCODELENGTH];
     int length;
+    if(filter){
+        writePlanarCodeHeader(stdout);
+    }
     while (readPlanarCode(code, &length, stdin)) {
         decodePlanarCode(code, graph, adj, neighbours);
         if(isHamiltonianConnected(graph, adj, neighbours)){
             numberOfHamiltonianConnected++;
+            if(filter && !invert){
+                writeCode(stdout, code, length);
+            }
         } else {
             numberOfNotHamiltonianConnected++;
+            if(filter && invert){
+                writeCode(stdout, code, length);
+            }
         }
         numberOfGraphs++;
     }

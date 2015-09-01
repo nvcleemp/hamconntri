@@ -11,12 +11,7 @@
 #include <getopt.h>
 #include "bitset.h"
 #include "lw_plane_graph.h"
-
-typedef int boolean;
-
-#define FALSE 0
-#define TRUE 1
-
+#include "boolean.h"
 
 bitset currentPath;
 int pathSequence[MAXN];

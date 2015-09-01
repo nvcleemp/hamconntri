@@ -12,6 +12,7 @@
 
 #include <stdio.h>
 #include "bitset.h"
+#include "boolean.h"
 
 #ifndef LW_PLANE_GRAPH_H
 #define	LW_PLANE_GRAPH_H
@@ -20,11 +21,6 @@
 #define MAXN (SET_CAPACITY - 1)
 #define MAXE (6*MAXN-12)    /* the maximum number of oriented edges */
 #define MAXCODELENGTH (MAXN+MAXE+3)
-
-typedef int boolean;
-
-#define TRUE 1
-#define FALSE 0
 
 typedef int GRAPH[MAXN + 1][MAXN];
 typedef int ADJACENCY[MAXN + 1];

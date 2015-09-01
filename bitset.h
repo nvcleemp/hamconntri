@@ -5,6 +5,9 @@
  * Licensed under the GNU AFFERO GPL, read the file LICENSE for details.
  */
 
+#ifndef BITSET_H
+#define	BITSET_H
+
 typedef unsigned long long int bitset;
 
 #define ZERO 0ULL
@@ -33,3 +36,5 @@ typedef unsigned long long int bitset;
 
 //the maximum capacity of a set
 #define SET_CAPACITY (sizeof(bitset)*8)
+
+#endif	/* BITSET_H */

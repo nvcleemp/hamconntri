@@ -38,6 +38,30 @@ void foundPath(GRAPH graph, ADJACENCY adj, bitset *neighbours){
             ADD(connected[v2], v1);
         }
     }
+    
+    //for each neighbour of the start vertex, we can find a new hamiltonian path
+    for(i = 0; i < adj[start]; i++){
+        //determine the position of the vertex x_i
+        int pos_i = pathPosition[graph[start][i]];
+        if(pos_i>1){
+            int xi1 = pathSequence[pos_i-1]; //the vertex x_{i-1}
+            //there is a hamiltonian path from xi1 to end
+            ADD(connected[xi1], end);
+            ADD(connected[end], xi1);
+        }
+    }
+    
+    //for each neighbour of the end vertex, we can find a new hamiltonian path
+    for(i = 0; i < adj[end]; i++){
+        //determine the position of the vertex x_i
+        int pos_i = pathPosition[graph[end][i]];
+        if(pos_i<pathLength-2){
+            int xi1 = pathSequence[pos_i+1]; //the vertex x_{i+1}
+            //there is a hamiltonian path from xi1 to start
+            ADD(connected[xi1], start);
+            ADD(connected[start], xi1);
+        }
+    }
 }
 
 /**

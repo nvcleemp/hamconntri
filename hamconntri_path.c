@@ -14,7 +14,44 @@
 #include "boolean.h"
 
 bitset currentPath;
+int pathSequence[MAXN];
+int pathPosition[MAXN+1];
+int pathLength;
 bitset connected[MAXN+1];
+
+void foundPath(GRAPH graph, ADJACENCY adj, bitset *neighbours){
+    int i;
+    int start = pathSequence[0];
+    int end = pathSequence[pathLength-1];
+    
+    //start and end are connected by a hamiltonian path
+    ADD(connected[start], end);
+    ADD(connected[end], start);
+    
+    //for each neighbour of the start vertex, we can find a new hamiltonian path
+    for(i = 0; i < adj[start]; i++){
+        //determine the position of the vertex x_i
+        int pos_i = pathPosition[graph[start][i]];
+        if(pos_i>1){
+            int xi1 = pathSequence[pos_i-1]; //the vertex x_{i-1}
+            //there is a hamiltonian path from xi1 to end
+            ADD(connected[xi1], end);
+            ADD(connected[end], xi1);
+        }
+    }
+    
+    //for each neighbour of the end vertex, we can find a new hamiltonian path
+    for(i = 0; i < adj[end]; i++){
+        //determine the position of the vertex x_i
+        int pos_i = pathPosition[graph[end][i]];
+        if(pos_i<pathLength-2){
+            int xi1 = pathSequence[pos_i+1]; //the vertex x_{i+1}
+            //there is a hamiltonian path from xi1 to start
+            ADD(connected[xi1], start);
+            ADD(connected[start], xi1);
+        }
+    }
+}
 
 /**
   * 
@@ -23,7 +60,15 @@ boolean continuePath(GRAPH graph, ADJACENCY adj, bitset *neighbours, int last, i
     int i;
     
     if(remaining==1){
-        return CONTAINS(neighbours[targetVertex], last);
+        if(CONTAINS(neighbours[targetVertex], last)){
+            pathSequence[pathLength] = targetVertex;
+            pathPosition[targetVertex] = pathLength;
+            pathLength++;
+            foundPath(graph, adj, neighbours);
+            return TRUE;
+        } else {
+            return FALSE;
+        }
     }
     
     if(!unvisitedNeighboursOfTarget){
@@ -34,6 +79,9 @@ boolean continuePath(GRAPH graph, ADJACENCY adj, bitset *neighbours, int last, i
     for(i = 0; i < adj[last]; i++){
         if(graph[last][i] != targetVertex && !CONTAINS(currentPath, graph[last][i])){
             ADD(currentPath, graph[last][i]);
+            pathSequence[pathLength] = graph[last][i];
+            pathPosition[graph[last][i]] = pathLength;
+            pathLength++;
             if(continuePath(graph, adj, neighbours, graph[last][i],
                     targetVertex, remaining - 1,
                     (CONTAINS(neighbours[targetVertex], graph[last][i]) ?
@@ -41,6 +89,7 @@ boolean continuePath(GRAPH graph, ADJACENCY adj, bitset *neighbours, int last, i
                         unvisitedNeighboursOfTarget))){
                 return TRUE;
             }
+            pathLength--;
             REMOVE(currentPath, graph[last][i]);
         }
     }
@@ -57,9 +106,14 @@ boolean startPath(GRAPH graph, ADJACENCY adj, bitset *neighbours, int startVerte
     }
     
     ADD(currentPath, startVertex);
+    pathSequence[0] = startVertex;
+    pathPosition[startVertex] = 0;
     for(i = 0; i < adj[startVertex]; i++){
         if(graph[startVertex][i] != targetVertex){
             ADD(currentPath, graph[startVertex][i]);
+            pathSequence[1] = graph[startVertex][i];
+            pathPosition[graph[startVertex][i]] = 1;
+            pathLength = 2;
             
             //search for path containing the edge (v, graph[v][i])
             if(continuePath(graph, adj, neighbours, graph[startVertex][i],

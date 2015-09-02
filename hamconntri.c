@@ -15,6 +15,7 @@
 
 bitset currentPath;
 int pathSequence[MAXN];
+int pathPosition[MAXN+1];
 int pathLength;
 bitset connected[MAXN+1];
 
@@ -48,6 +49,7 @@ boolean continuePath(GRAPH graph, ADJACENCY adj, bitset *neighbours, int last, i
     if(remaining==1){
         if(CONTAINS(neighbours[targetVertex], last)){
             pathSequence[pathLength] = targetVertex;
+            pathPosition[targetVertex] = pathLength;
             pathLength++;
             foundPath(graph, adj, neighbours);
             return TRUE;
@@ -65,6 +67,7 @@ boolean continuePath(GRAPH graph, ADJACENCY adj, bitset *neighbours, int last, i
         if(graph[last][i] != targetVertex && !CONTAINS(currentPath, graph[last][i])){
             ADD(currentPath, graph[last][i]);
             pathSequence[pathLength] = graph[last][i];
+            pathPosition[graph[last][i]] = pathLength;
             pathLength++;
             if(continuePath(graph, adj, neighbours, graph[last][i],
                     targetVertex, remaining - 1,
@@ -91,10 +94,12 @@ boolean startPath(GRAPH graph, ADJACENCY adj, bitset *neighbours, int startVerte
     
     ADD(currentPath, startVertex);
     pathSequence[0] = startVertex;
+    pathPosition[startVertex] = 0;
     for(i = 0; i < adj[startVertex]; i++){
         if(graph[startVertex][i] != targetVertex){
             ADD(currentPath, graph[startVertex][i]);
             pathSequence[1] = graph[startVertex][i];
+            pathPosition[graph[startVertex][i]] = 1;
             pathLength = 2;
             
             //search for path containing the edge (v, graph[v][i])

@@ -214,13 +214,29 @@ boolean isHamiltonianConnected(GRAPH graph, ADJACENCY adj, bitset* neighbours){
     
     int order = graph[0][0];
     
-    for(i=1; i<= order-1; i++){
-        for(j=i+1; j<= order; j++){
-            if(!CONTAINS(connected[i], j)){
+    //next we sort the vertices according to there degree
+    //we just use a radix sort for now
+    //the maximum degree is at most order - 1, and the minimum
+    //degree is at least 3.
+    int sorted[MAXN];
+    int sortedPosition = 0;
+    for(i = order - 1; i >= 3; i--){
+        for(j = 1; j <= order; j++){
+            if(adj[j]==i){
+                sorted[sortedPosition++] = j;
+            }
+        }
+    }
+    
+    for(i=0; i < order-1; i++){
+        for(j=i+1; j< order; j++){
+            int v1 = sorted[i];
+            int v2 = sorted[j];
+            if(!CONTAINS(connected[v1], v2)){
                 //clear old path
                 currentPath = EMPTY_SET;
                 
-                if(!startPath(graph, adj, neighbours, i, j, order)){
+                if(!startPath(graph, adj, neighbours, v1, v2, order)){
                     return FALSE;
                 }
             }

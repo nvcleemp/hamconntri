@@ -19,6 +19,65 @@ int pathPosition[MAXN+1];
 int pathLength;
 bitset connected[MAXN+1];
 
+void derivePathDepth1_fromStart(GRAPH graph, ADJACENCY adj, bitset *neighbours,
+        int xi, int xi1, int end){
+    int i;
+    
+    int xi1Pos = pathPosition[xi1];
+    
+    for(i = 0; i < adj[xi1]; i++){
+        int yi = graph[xi1][i];
+        if(yi!=xi){
+            int direction = (pathPosition[yi] < xi1Pos) ? 1 : -1;
+            int yi1 = pathSequence[pathPosition[yi]+direction];
+            ADD(connected[yi1], end);
+            ADD(connected[end], yi1);
+        }
+    }
+    
+    for(i = 0; i < adj[end]; i++){
+        int yi = graph[end][i];
+        if(yi!=pathSequence[0]){
+            //the other case is already handled by ham cycle
+            int direction = (pathPosition[yi] < xi1Pos) ? -1 : 1;
+            int yi1 = pathSequence[pathPosition[yi]+direction];
+            ADD(connected[yi1], xi1);
+            ADD(connected[xi1], yi1);
+        }
+    }
+}
+
+void derivePathDepth1_fromEnd(GRAPH graph, ADJACENCY adj, bitset *neighbours,
+        int xi, int xi1, int start){
+    int i;
+    
+    int xi1Pos = pathPosition[xi1]; //position of x_{i+1}
+    
+    for(i = 0; i < adj[xi1]; i++){
+        int yi = graph[xi1][i];
+        if(yi!=xi){
+            //direction on original path of y_{i-1} with respect to y_i
+            int direction = (pathPosition[yi] < xi1Pos) ? 1 : -1;
+            int yi1 = pathSequence[pathPosition[yi]+direction]; //y_{i-1}
+            ADD(connected[yi1], start);
+            ADD(connected[start], yi1);
+        }
+    }
+    
+    for(i = 0; i < adj[start]; i++){
+        int yi = graph[start][i];
+        if(yi!=pathSequence[pathLength-1]){
+            //the other case is already handled by ham cycle
+            
+            //direction on original path of y_{i+1} with respect to y_i
+            int direction = (pathPosition[yi] < xi1Pos) ? -1 : 1;
+            int yi1 = pathSequence[pathPosition[yi]+direction]; //y_{i+1}
+            ADD(connected[yi1], xi1);
+            ADD(connected[xi1], yi1);
+        }
+    }
+}
+
 void foundPath(GRAPH graph, ADJACENCY adj, bitset *neighbours){
     int i;
     int start = pathSequence[0];
@@ -48,6 +107,7 @@ void foundPath(GRAPH graph, ADJACENCY adj, bitset *neighbours){
             //there is a hamiltonian path from xi1 to end
             ADD(connected[xi1], end);
             ADD(connected[end], xi1);
+            derivePathDepth1_fromStart(graph, adj, neighbours, graph[start][i], xi1, end);
         }
     }
     
@@ -60,6 +120,7 @@ void foundPath(GRAPH graph, ADJACENCY adj, bitset *neighbours){
             //there is a hamiltonian path from xi1 to start
             ADD(connected[xi1], start);
             ADD(connected[start], xi1);
+            derivePathDepth1_fromEnd(graph, adj, neighbours, graph[end][i], xi1, start);
         }
     }
 }
